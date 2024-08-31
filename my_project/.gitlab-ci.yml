@@ -1,0 +1,35 @@
+image: python:3.9
+
+services:
+  - mysql:latest # Optional, if you want to run tests on MySQL in CI before applying migrations
+
+variables:
+  MYSQL_DATABASE: "mysql"
+  MYSQL_USER: "mysql"
+  MYSQL_PASSWORD: "mysql"
+  MYSQL_HOST: "104.197.149.16"
+  DJANGO_SETTINGS_MODULE: "my_project.settings"
+
+stages:
+  - install
+  - migrate
+
+before_script:
+  # Install dependencies
+  - pip install -r requirements.txt
+  # Set up MySQL client for migration
+  - apt-get update && apt-get install -y default-mysql-client
+
+install_dependencies:
+  stage: install
+  script:
+    # Install any additional dependencies
+    - pip install django mysqlclient
+
+migrate:
+  stage: migrate
+  script:
+    # Apply migrations to the GCP MySQL database
+    - python manage.py migrate --noinput
+  only:
+    - main # or the branch you're working on
