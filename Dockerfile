@@ -1,7 +1,7 @@
 # Use the official Python image from the Docker Hub
 FROM python:3.11-slim
 
-# Set environment variables to prevent Python from writing .pyc files to disk
+# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
@@ -11,7 +11,14 @@ WORKDIR /app
 # Copy the requirements file into the container
 COPY requirements.txt /app/
 
-# Install the dependencies
+# Install system dependencies for mysqlclient
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    libmysqlclient-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code into the container
